@@ -26,6 +26,7 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\MinkExtension\Context\RawMinkContext;
 use Page\FavoritesPage;
 use Page\FilesPage;
+use Page\FilesPageCRUD;
 use Page\OwncloudPage;
 use Page\SharedByLinkPage;
 use Page\SharedWithOthersPage;
@@ -136,6 +137,7 @@ class WebUIFilesContext extends RawMinkContext implements Context {
 	 */
 	private $featureContext;
 
+	private $filesPageCRUD;
 	/**
 	 *
 	 * @var WebUIGeneralContext
@@ -155,6 +157,7 @@ class WebUIFilesContext extends RawMinkContext implements Context {
 	 * @param TagsPage $tagsPage
 	 * @param SharedByLinkPage $sharedByLinkPage
 	 * @param SharedWithOthersPage $sharedWithOthersPage
+	 * @param FilesPageCRUD $filesPageCRUD
 	 *
 	 * @return void
 	 */
@@ -166,7 +169,8 @@ class WebUIFilesContext extends RawMinkContext implements Context {
 		SharedWithYouPage $sharedWithYouPage,
 		TagsPage $tagsPage,
 		SharedByLinkPage $sharedByLinkPage,
-		SharedWithOthersPage $sharedWithOthersPage
+		SharedWithOthersPage $sharedWithOthersPage,
+		FilesPageCRUD $filesPageCRUD
 	) {
 		$this->trashbinPage = $trashbinPage;
 		$this->filesPage = $filesPage;
@@ -176,6 +180,7 @@ class WebUIFilesContext extends RawMinkContext implements Context {
 		$this->tagsPage = $tagsPage;
 		$this->sharedByLinkPage = $sharedByLinkPage;
 		$this->sharedWithOthersPage = $sharedWithOthersPage;
+		$this->filesPageCRUD = $filesPageCRUD;
 	}
 
 	/**
@@ -1609,6 +1614,81 @@ class WebUIFilesContext extends RawMinkContext implements Context {
 				"could not find button 'Delete' in action Menu",
 				$e->getMessage()
 			);
+		}
+	}
+
+	/**
+	 * @Then it should be possible to delete file/folder :name using the webUI
+	 *
+	 * @param string $name
+	 *
+	 * @return void
+	 * @throws \Exception
+	 */
+	public function itShouldBePossibleToDeleteFileFolderUsingTheWebUI($name) {
+		$this->deleteTheFileUsingTheWebUI($name, true);
+	}
+
+	/**
+	 * @Then /^the option to rename (?:file|folder) ((?:'[^']*')|(?:"[^"]*")) should (not|)\s?be available in the webUI$/
+	 *
+	 * @param string $name
+	 * @param string $shouldOrNot
+	 *
+	 * @return void
+	 * @throws \Exception
+	 */
+	public function itShouldNotBePossibleToRenameFileFolderUsingTheWebUI($name, $shouldOrNot) {
+		$possible = $shouldOrNot !== "not";
+		$name = \trim($name, $name[0]);
+		$pageObject = $this->getCurrentPageObject();
+		$session = $this->getSession();
+		$pageObject->waitTillPageIsLoaded($session);
+		$fileRow = $pageObject->findFileRowByName($name, $session);
+		if ($possible) {
+			PHPUnit\Framework\Assert::assertTrue($fileRow->isActionLabelAvailable("Rename", $session));
+		} else {
+			PHPUnit\Framework\Assert::assertFalse($fileRow->isActionLabelAvailable("Rename", $session));
+		}
+	}
+
+	/**
+	 * @Then /^the option to delete (?:file|folder) ((?:'[^']*')|(?:"[^"]*")) should (not|)\s?be available in the webUI$/
+	 *
+	 * @param string $name
+	 * @param string $shouldOrNot
+	 *
+	 * @return void
+	 * @throws \Exception
+	 */
+	public function optionToDeleteShouldNotBeAvailable($name, $shouldOrNot) {
+		$possible = $shouldOrNot !== "not";
+		$name = \trim($name, $name[0]);
+		$pageObject = $this->getCurrentPageObject();
+		$session = $this->getSession();
+		$pageObject->waitTillPageIsLoaded($session);
+		$fileRow = $pageObject->findFileRowByName($name, $session);
+		if ($possible) {
+			PHPUnit\Framework\Assert::assertTrue($fileRow->isActionLabelAvailable("Delete", $session));
+		} else {
+			PHPUnit\Framework\Assert::assertFalse($fileRow->isActionLabelAvailable("Delete", $session));
+		}
+	}
+
+	/**
+	 * @Then /^the option to upload file should (not|)\s?be available in the webUI$/
+	 *
+	 * @param string $shouldOrNot
+	 *
+	 * @return void
+	 * @throws \Exception
+	 */
+	public function itShouldNotBePossibleToUploadFileFolderUsingTheWebUI($shouldOrNot) {
+		$possible = $shouldOrNot !== "not";
+		if ($possible) {
+			PHPUnit\Framework\Assert::assertTrue($this->filesPageCRUD->isUploadButtonAvailable());
+		} else {
+			PHPUnit\Framework\Assert::assertFalse($this->filesPageCRUD->isUploadButtonAvailable());
 		}
 	}
 

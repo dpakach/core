@@ -572,4 +572,14 @@ class FileRow extends OwncloudPage {
 		);
 		return $element;
 	}
+
+	/**
+	 * Returns if action menu is visible in the filerow
+	 *
+	 * @return boolean
+	 */
+	public function isActionLabelAvailable($actionLabel, Session $session) {
+		$actionMenu = $this->openFileActionsMenu($session);
+		return $actionMenu->isActionLabelVisible($actionLabel);
+	}
 }

@@ -218,4 +218,15 @@ class FileActionsMenu extends OwncloudPage {
 	public function getActionLabelLocalized($action) {
 		return $this->findButton($action)->getText();
 	}
+
+	public function isActionLabelVisible($action) {
+		$xpathLocator = \sprintf($this->fileActionXpath, $action);
+		$this->waitTillElementIsNotNull($xpathLocator);
+		$button = $this->menuElement->find(
+			"xpath",
+			$xpathLocator
+		);
+		if (!$button) return false;
+		else return $button->isVisible() === true;
+	}
 }
