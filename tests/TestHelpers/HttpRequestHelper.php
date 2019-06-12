@@ -99,7 +99,7 @@ class HttpRequestHelper {
 
 	/**
 	 * Send the requests to the server in parallel.
-	 * This function takes an array of requests and an option an client.
+	 * This function takes an array of requests and an optional client.
 	 * It will send all the requests to the server using the Pool object in guzzle.
 	 *
 	 * @param array $requests

@@ -4,7 +4,7 @@ Feature: sharing
   Background:
     Given using OCS API version "1"
     And using old DAV path
-    And these users have been created with default attributes with skeleton files using batch action:
+    And these users have been created with default attributes and skeleton files:
       | username |
       | user0    |
       | user1    |

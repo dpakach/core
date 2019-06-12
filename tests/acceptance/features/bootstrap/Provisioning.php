@@ -332,53 +332,6 @@ trait Provisioning {
 
 	/**
 	 * @Given /^these users have been created with ?(default attributes and|) skeleton files ?(but not initialized|):$/
-	 * expects a table of users with the heading
-	 * "|username|password|displayname|email|"
-	 * password, displayname & email are optional
-	 *
-	 * @param string $setDefaultAttributes just set the defaults if it doesn't exist
-	 * @param string $doNotInitialize just create the user, do not trigger creating skeleton files etc
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws \Exception
-	 */
-	public function theseUsersHaveBeenCreated($setDefaultAttributes, $doNotInitialize, TableNode $table) {
-		foreach ($table as $row) {
-			if (isset($row['displayname'])) {
-				$displayName = $row['displayname'];
-			} else {
-				$displayName = null;
-			}
-
-			if (isset($row['email'])) {
-				$email = $row['email'];
-			} else {
-				$email = null;
-			}
-
-			if (isset($row['password'])) {
-				$password = $this->getActualPassword($row['password']);
-			} else {
-				// Let createUser() select the password
-				$password = null;
-			}
-
-			$this->createUser(
-				$row ['username'],
-				$password,
-				$displayName,
-				$email,
-				($doNotInitialize === ""),
-				null,
-				!($setDefaultAttributes === "")
-			);
-		}
-	}
-
-	/**
-	 * @Given /^these users have been created\s?(with default attributes|)\s?(but not initialized|)with skeleton files using batch action:$/
-	 *
 	 * This function will allow us to send user creation requests in parallel.
 	 * This will be faster in comparision to waiting for each request to complete before sending another request.
 	 *
@@ -398,7 +351,7 @@ trait Provisioning {
 		$setDefaultAttributes = $setDefaultAttributes !== null;
 		$initialize = $doNotInitialize !== null;
 
-		// We add all the requests bodies in an array.
+		// We add all the request bodies in an array.
 		$bodies = [];
 		// We add all the request objects in an array so that we can send all the requests in parallel.
 		$requests = [];
@@ -1321,7 +1274,7 @@ trait Provisioning {
 		$requests = [];
 		$client = new Client();
 		foreach ($users as $user) {
-			// create new request for each user but not send it yet.
+			// create a new request for each user but do not send it yet.
 			// push the newly created request to an array.
 			\array_push(
 				$requests,
